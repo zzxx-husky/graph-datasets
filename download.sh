@@ -1,7 +1,7 @@
 scriptdir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 graphmap_parse=
 webgraphz_convert=
-graphs=(livejournal twitter)
+graphs=(livejournal twitter webuk_2007_05)
 action=$1
 if [ -z "${action}" ]; then
   action=download
@@ -165,6 +165,25 @@ download_twitter() {
   cd ${dir}
 
   local url=http://data.law.di.unimi.it/webdata/twitter-2010/twitter-2010
+  local name=$(name_from_url ${url})
+  for ext in graph properties md5sums; do
+    local urlext=${url}.${ext}
+    xwget ${urlext}
+  done
+  if [ ! -z $(which md5sums) ]; then
+    md5sums -c ${name}.md5sums
+  fi
+}
+
+download_webuk_2007_05() {
+  local dir=$1
+  if [ -z ${dir} ]; then
+    dir=$(pwd)
+  fi
+  dir=$(realpath ${dir})
+  cd ${dir}
+
+  local url=http://data.law.di.unimi.it/webdata/uk-2007-05/uk-2007-05
   local name=$(name_from_url ${url})
   for ext in graph properties md5sums; do
     local urlext=${url}.${ext}
