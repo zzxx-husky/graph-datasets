@@ -124,7 +124,8 @@ install_terashuf() {
     echo "Failed to make terashuf"
     exit
   fi
-  terashuf=$(realpath ./terashuf)
+  # the directory to store graph data is usually large enough to store tmp data
+  mkdir tmp; TMPDIR=${scriptdir}/tmp terashuf=$(realpath ./terashuf)
   cd ${cwd}
 }
 
