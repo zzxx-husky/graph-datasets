@@ -1,6 +1,7 @@
 scriptdir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 graphmap_parse=
 webgraphz_convert=
+terashuf=
 graphs=(livejournal twitter webuk_2007_05)
 action=$1
 if [ -z "${action}" ]; then
@@ -101,6 +102,40 @@ install_graphmap() {
   fi
   graphmap_parse=$(realpath ./target/release/parse)
   cd ${cwd}
+}
+
+install_terashuf() {
+  global terashuf
+  local cwd=$(pwd)
+
+  cd ${scriptdir}
+  if [ ! -d terashuf ]; then
+    git clone --depth=1 https://github.com/alexandres/terashuf
+  fi
+  if [ ! -d terashuf ]; then
+    echo "Failed to clone terashuf"
+    exit
+  fi
+  cd terashuf
+  if [ ! -f terashuf ]; then
+    make
+  fi
+  if [ ! -f terashuf ]; then
+    echo "Failed to make terashuf"
+    exit
+  fi
+  terashuf=$(realpath ./terashuf)
+  cd ${cwd}
+}
+
+randomize() {
+  if [ -z "$1" ]; then
+    echo "Graph file not given"
+    exit
+  fi
+  local name=$(realpath $1)
+  install_terashuf
+  ${terashuf} < $1 > $1.rand
 }
 
 edges2graphmap() {
@@ -224,4 +259,8 @@ elif [ ${action} = "edges2graphmap" ]; then
   edges2graphmap $2
 elif [ ${action} = "webgraph2edges" ]; then
   webgraph2edges $2 
+elif [ ${action} = "randomize" ]; then
+  randomize $2
+else 
+  echo "Unknown action: ${action}"
 fi
