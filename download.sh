@@ -108,7 +108,7 @@ install_terashuf() {
   global terashuf
   local cwd=$(pwd)
 
-  cd ${scriptdir}
+  cd ${scriptdir}; # pwd
   if [ ! -d terashuf ]; then
     git clone --depth=1 https://github.com/alexandres/terashuf
   fi
@@ -125,7 +125,7 @@ install_terashuf() {
     exit
   fi
   # the directory to store graph data is usually large enough to store tmp data
-  mkdir tmp; TMPDIR=${scriptdir}/tmp terashuf=$(realpath ./terashuf)
+  terashuf=$(realpath ./terashuf)
   cd ${cwd}
 }
 
@@ -136,7 +136,8 @@ randomize() {
   fi
   local name=$(realpath $1)
   install_terashuf
-  ${terashuf} < $1 > $1.rand
+  mkdir ${scriptdir}/tmp
+  TMPDIR=${scriptdir}/tmp ${terashuf} < $1 > $1.rand
 }
 
 edges2graphmap() {
@@ -262,6 +263,8 @@ elif [ ${action} = "webgraph2edges" ]; then
   webgraph2edges $2 
 elif [ ${action} = "randomize" ]; then
   randomize $2
+elif [ ${action} = "split" ]; then
+  split -n l/$3 $2 $2.part.
 else 
   echo "Unknown action: ${action}"
 fi
